@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.persistence.*;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Users")
-
+@NamedEntityGraph(name = "User.roles", attributeNodes = @NamedAttributeNode("roles"))
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,18 +30,19 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
 
-    public User(){};
-
-
-
-    public User(String userName, String password) {
+    public User(UserService userService, String userName, String password, Set<Role> roles) {
         this.userName = userName;
         this.password = password;
+        this.roles = roles;
+    }
+
+    public User() {
+
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+        return this.getRoles();
     }
 
     @Override
